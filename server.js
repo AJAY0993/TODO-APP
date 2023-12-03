@@ -66,10 +66,10 @@ app.post('/signup', async (req, res) => {
     }
     else {
         const result = await db.collection('users').insertOne({ email: req.body.email, password: req.body.password, todos: [] });
-        let userTodos = await db.collection('users').findOne({ email: req.body.email });
-        userTodos = userTodos.todos;
+        const user = await db.collection('users').findOne({ email: req.body.email });
+        userTodos = user.todos;
         console.log(userTodos);
-        res.render('pages/home.ejs', { data: userTodos });
+        res.render('pages/home.ejs', { user: user });
     }
 })
 
