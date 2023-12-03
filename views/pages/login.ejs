@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../partials/head') %>
+
+    <body>
+        <main class="sign-up-form">
+            <h1 class="sign-up-title">Login in</h1>
+            <p class="sign-up-intro">Welcome back
+                Doingly will helps you to stay organized and perform your tasks much faster</p>
+            <form action="login" method="post">
+                <label for="email">Email</label>
+                <input type="email" required name="email" id="email">
+                <label for="password">Password</label>
+                <input type="password" max="20" min="8" name="password" id="password">
+                <button type="submit">submit</button>
+            </form>
+        </main>
+    </body>
+
+</html>
