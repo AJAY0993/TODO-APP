@@ -3,18 +3,18 @@
 <%- include('../partials/head') %>
 
     <body>
-        <div class="container">
-            <header class="hero">
+        <header class="hero">
+            <div class="container">
                 <h1><span>Things to do </span><span class="add-todo" role="button">+</span></h1>
-            </header>
-            <span id="email-u">
-                <%=user.email%>
-            </span><span id="password-u">
-                <%=user.password%>
-            </span>
-            <ul class="todos-list">
-            </ul>
-        </div>
+            </div>
+        </header>
+        <span id="email-u">
+            <%=user.email%>
+        </span><span id="password-u">
+            <%=user.password%>
+        </span>
+        <ul class="todos-list">
+        </ul>
 
         <div class="add-todo-form">
             <form action="" method="">
@@ -81,30 +81,6 @@
                 alert("TODO ADDED")
             });
 
-            // deleteBtn.forEach((btn, i) => {
-            //     btn.addEventListener('click', (e) => {
-            //         const id = i
-            //         const email = document.querySelector('#email-u').innerText.trim()
-            //         const password = document.querySelector('#password-u').innerText.trim()
-            //         console.log(email, password)
-            //         const todo = {
-            //             email, id, password
-            //         }
-            //         fetch('/deleteTodo', {
-            //             method: 'PUT',
-            //             headers: {
-            //                 'Content-Type': 'application/json'
-            //             },
-            //             body: JSON.stringify(todo)
-            //         })
-            //             .then(data => data.json())
-            //             .then(data => createTodos(data))
-            //             .catch(err => console.log(err))
-            //     })
-
-            // })
-
-
             addBtn.addEventListener('click', () => {
                 form.style.display = 'block';
                 container.style.display = 'none'
@@ -118,6 +94,7 @@
                             todolist.innerHTML = ''
                             createTodos(res)
                             deleteBtn = document.querySelectorAll('.remove-todo-btn');
+                            markCompleteBtn = document.querySelectorAll('.mark-completed-btn');
                             deleteBtn.forEach((btn, i) => {
                                 btn.addEventListener('click', (e) => {
                                     const id = i
@@ -140,6 +117,29 @@
                                 })
 
                             })
+                            markCompleteBtn.forEach((btn, i) => {
+                                btn.addEventListener('click', (e) => {
+                                    console.log('click')
+                                    const id = i
+                                    const email = document.querySelector('#email-u').innerText.trim()
+                                    const password = document.querySelector('#password-u').innerText.trim()
+                                    console.log(email, password)
+                                    const todo = {
+                                        email, id, password
+                                    }
+                                    fetch('/markCompleted', {
+                                        method: 'PUT',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify(todo)
+                                    })
+                                        .then(data => data.json())
+                                        .then(data => { console.log(data); loadTodos() })
+                                        .catch(err => console.log(err))
+                                })
+
+                            })
 
                         }
                         else {
@@ -152,9 +152,9 @@
                 todolist.innerHTML = ''
                 data.forEach((todo, i) => {
                     console.log(todo)
-                    const li = document.createElement('li')
-                    li.innerHTML = `<li class="todo-list-item">
-                    <span class=${todo.category.toLowerCase()}>${todo.category}</span>
+                    const li = document.createElement('li');
+                    li.className = 'todo-list-item' + ' ' + (todo.completed ? "completed" : '');
+                    li.innerHTML = `<span class=${todo.category.toLowerCase()}>${todo.category}</span>
                     <div class="">
                         <h3 class="todo-title">
                             ${todo.title}
@@ -165,7 +165,7 @@
                     </div>
                     <button class="mark-completed-btn">✔</button>
                     <button class="remove-todo-btn" data-id= ${i}>---</button>
-                </li>`
+                `
                     todolist.appendChild(li)
                 })
             }

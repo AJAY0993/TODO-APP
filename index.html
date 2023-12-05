@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOINGLY</title>
+    <link rel="stylesheet" href="./public/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <header class="hero">
+        <div class="container">
+            <h1><span>Things to do </span><span class="add-todo" role="button">+</span></h1>
+        </div>
+    </header>
+    <span id="email-u">
+        <%=user.email%>
+    </span><span id="password-u">
+        <%=user.password%>
+    </span>
+    <ul class="todos-list">
+
+        <li class="todo-list-item completed">
+            <span class=${todo.category.toLowerCase()}>${todo.category}</span>
+            <div class="">
+                <h3 class="todo-title">
+                    ${todo.title}
+                </h3>
+                <p class="todo-description">
+                    ${todo.description}
+                </p>
+            </div>
+            <button class="completed-todo-btn">✔</button>
+            <button class="remove-todo-btn" data-id=${i}>---</button>
+        </li>
+
+    </ul>
+
+    <div class="add-todo-form">
+        <form action="" method="">
+            <div>
+                <label for="title">Title</label>
+                <input id="title" name="title">
+            </div>
+            <div>
+                <label for="description">Description</label>
+                <input id="description" name="description">
+            </div>
+            <div>
+                <label for="category"></label>
+                <select name="category" id="category">
+                    <option name="">SPORT</option>
+                    <option name="">STUDY</option>
+                    <option name="">SHOPPING</option>
+                    <option name="">EXERCISE</option>
+                    <option name="">TRAVEL</option>
+                </select>
+            </div>
+            <div>
+                <label for="email"> Email
+                </label>
+                <input type="email" name="email" id="email">
+            </div>
+            <button type="submit" class="add-todo-btn">ADD</button>
+        </form>
+    </div>
+    <script>
+        const title = document.querySelector('#title')
+        const description = document.querySelector('#description')
+        const email = document.querySelector('#email')
+        const category = document.querySelector('#category')
+        const form = document.querySelector('form');
+        const container = document.querySelector('.container');
+        const addBtn = document.querySelector('.add-todo');
+        const todolist = document.querySelector('.todos-list');
+        let deleteBtn;
+        const user = { email: document.querySelector('#email-u').innerText.trim(), password: document.querySelector('#password-u').innerText.trim() };
+
+        loadTodos()
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = {
+                email: email.value,
+                title: title.value,
+                description: description.value,
+                category: category.value,
+            }
+            console.log(formData)
+            const res = await fetch('/addtodo', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            if (!res.ok) throw new Error("SOME ERROR OCCURED")
+            const data = await res.json();
+            loadTodos();
+            form.style.display = 'none';
+            container.style.display = 'block';
+            alert("TODO ADDED")
+        });
+
+        // deleteBtn.forEach((btn, i) => {
+        //     btn.addEventListener('click', (e) => {
+        //         const id = i
+        //         const email = document.querySelector('#email-u').innerText.trim()
+        //         const password = document.querySelector('#password-u').innerText.trim()
+        //         console.log(email, password)
+        //         const todo = {
+        //             email, id, password
+        //         }
+        //         fetch('/deleteTodo', {
+        //             method: 'PUT',
+        //             headers: {
+        //                 'Content-Type': 'application/json'
+        //             },
+        //             body: JSON.stringify(todo)
+        //         })
+        //             .then(data => data.json())
+        //             .then(data => createTodos(data))
+        //             .catch(err => console.log(err))
+        //     })
+
+        // })
+
+
+        addBtn.addEventListener('click', () => {
+            form.style.display = 'block';
+            container.style.display = 'none'
+        })
+        function loadTodos() {
+            fetch(`/getTodos/user?email=${user.email}&password=${user.password}`)
+                .then(res => res.json())
+                .then(res => {
+                    console.log(res)
+                    if (res.length > 0) {
+                        todolist.innerHTML = ''
+                        createTodos(res)
+                        deleteBtn = document.querySelectorAll('.remove-todo-btn');
+                        deleteBtn.forEach((btn, i) => {
+                            btn.addEventListener('click', (e) => {
+                                const id = i
+                                const email = document.querySelector('#email-u').innerText.trim()
+                                const password = document.querySelector('#password-u').innerText.trim()
+                                console.log(email, password)
+                                const todo = {
+                                    email, id, password
+                                }
+                                fetch('/deleteTodo', {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(todo)
+                                })
+                                    .then(data => data.json())
+                                    .then(data => loadTodos())
+                                    .catch(err => console.log(err))
+                            })
+
+                        })
+
+                    }
+                    else {
+                        todolist.innerHTML = '<h1>Start adding todos</h1>'
+                    }
+                })
+                .catch(err => console.log(err))
+        }
+        function createTodos(data) {
+            todolist.innerHTML = ''
+            data.forEach((todo, i) => {
+                console.log(todo)
+                const li = document.createElement('li')
+                li.innerHTML = `<li class="todo-list-item">
+                    <span class=${todo.category.toLowerCase()}>${todo.category}</span>
+                    <div class="">
+                        <h3 class="todo-title">
+                            ${todo.title}
+                        </h3>
+                        <p class="todo-description">
+                            ${todo.description}
+                        </p>
+                    </div>
+                    <button class="mark-completed-btn">✔</button>
+                    <button class="remove-todo-btn" data-id= ${i}>---</button>
+                </li>`
+                todolist.appendChild(li)
+            })
+        }
+
+
+    </script>
+</body>
+
+</html>

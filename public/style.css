@@ -15,7 +15,13 @@ body {
 }
 
 .container {
-    max-width: 600px;
+    width: 1100px;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.error {
+    color: red;
 }
 
 .sign-up-form {
@@ -87,6 +93,7 @@ img {
 }
 
 .hero {
+    width: 100%;
     background: rgb(43, 73, 109);
     background: -moz-linear-gradient(62deg, rgba(43, 73, 109, 1) 0%, rgba(79, 120, 165, 1) 100%);
     background: -webkit-linear-gradient(62deg, rgba(43, 73, 109, 1) 0%, rgba(79, 120, 165, 1) 100%);
@@ -96,6 +103,7 @@ img {
     color: white;
     padding: 1em;
     max-width: 100%;
+    justify-self: flex-start;
 }
 
 .hero>h1 {
@@ -114,16 +122,26 @@ img {
 
 .todo-list-item {
     display: flex;
+    gap: 2em;
     justify-content: space-between;
     align-items: center;
     margin: 1em 0;
     -webkit-box-shadow: 3px 3px 35px 0px rgba(0, 0, 0, 0.43);
     -moz-box-shadow: 3px 3px 35px 0px rgba(0, 0, 0, 0.43);
     box-shadow: 3px 3px 35px 0px rgba(0, 0, 0, 0.43);
-    padding: 1em 0;
-    width: 400px;
+    padding: 1em;
     max-width: 100%;
     padding-right: .5em;
+}
+
+@media (max-width:650px) {
+    .todo-list-item {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-direction: column;
+        gap: 2em;
+    }
 }
 
 .completed {
@@ -175,15 +193,23 @@ img {
     font-size: 1rem;
     letter-spacing: 4px;
     color: white;
+    margin-left: auto;
+    display: inline-block;
 }
 
-.remove-todo-btn {
+.remove-todo-btn,
+.mark-completed-btn {
     font-size: 2rem;
     color: red;
     background: none;
     outline: none;
     border: 0;
     cursor: pointer;
+}
+
+.mark-completed-btn {
+    color: green;
+    font-size: 2rem;
 }
 
 #email-u,

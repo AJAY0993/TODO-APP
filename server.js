@@ -41,17 +41,21 @@ app.post('/welcomeBack', (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
-    let user = await db.collection('users').findOne({ email: req.body.email });
-    console.log(req.body.password, user.password, req.body.password === user.password)
-    console.log(user);
-    if (req.body.password !== user.password) {
-        res.json({
-            err: "incorrect password"
-        })
+
+    try {
+        let user = await db.collection('users').findOne({ email: req.body.email });
+        if (!user) {
+            throw new Error("Invalid email id")
+        }
+        if (req.body.password !== user.password) {
+            throw new Error("Invalid password")
+        }
+        userTodos = user.todos;
+        res.render('pages/home.ejs', { data: userTodos, user: user });
     }
-    userTodos = user.todos;
-    console.log(userTodos, 'user todos');
-    res.render('pages/home.ejs', { data: userTodos, user: user });
+    catch (err) {
+        res.json({ Error: err.message })
+    }
 })
 
 app.get('/login', (req, res) => {
@@ -84,6 +88,7 @@ app.put('/addtodo', async (req, res) => {
         description: req.body.description,
         category: req.body.category,
         email: req.body.email,
+        completed: false,
     }
     userTodos.push(newTodo);
     userTodos = userTodos.map((todo, i) => { return { ...todo, id: i } })
@@ -124,6 +129,27 @@ app.get(`/getTodos/user`, async (req, res) => {
     }
     catch (err) {
         res.json(err)
+    }
+});
+app.put('/markCompleted', async (req, res) => {
+    try {
+        console.log('completed req recieved with id', req.body.id, req.body.email);
+        const user = await db.collection('users').findOne({ email: req.body.email });
+        console.log(user)
+        let userTodos = user.todos
+        userTodos = userTodos.map((todo) => +todo.id !== +req.body.id ? todo : { ...todo, completed: true })
+        console.log(userTodos)
+        userTodos = userTodos.map((todo, i) => { return { ...todo, id: i } });
+        const result = await db.collection('users').updateOne({ email: req.body.email }, {
+            $set: { todos: userTodos }
+        });
+        const updateUser = await db.collection('users').findOne({ email: req.body.email });
+        const updatedTodos = updateUser.todos;
+        console.log(updatedTodos)
+        res.json(updatedTodos);
+    }
+    catch (err) {
+
     }
 })
 app.listen(1000)
